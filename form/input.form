@@ -1,0 +1,6 @@
+<div class="form-group" id="id-{__name__}">
+	<label class="col-sm-3 control-label">{__caption__}</label>
+	<div class="col-sm-9">
+		<input class="form-control" name="{__name__}" type="text" value="{__value__}" autocomplete="off" {__dataToggle__}>
+    </div>
+</div>

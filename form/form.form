@@ -1,0 +1,20 @@
+<div class="col-md-6">
+  <form class="form-horizontal" role="form" name="form{__formID__}" id="id-form{__formID__}" enctype="multipart/form-data" onsubmit="return checkForm();" action="{__action__}" method="POST">
+    {__inputs__}
+    <div class="form-group">
+      <div class="col-sm-push-3 col-sm-9">
+        <button type="submit" id="id-submit{__formID__}" class="btn col-xs-12">Submit</button>
+      </div>
+    </div>
+  </form>
+</div>
+<script type="text/javascript" src="{__formDir__}/requirement.js"></script>
+<script type="text/javascript">
+  $('[data-toggle="popover"]').popover({placement: "bottom", trigger:"focus"});
+  //Überprüfung hinzufügen
+  var checker{__formID__} = new fieldCheck();
+  checker{__formID__}.varName = "checker{__formID__}";
+  checker{__formID__}.formObject = document.getElementById("id-form{__formID__}");
+  checker{__formID__}.setSubmitButton(document.getElementById("id-submit{__formID__}"));
+  {__checkObjects__}
+</script>

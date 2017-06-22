@@ -1,0 +1,6 @@
+<div class="form-group" id="id-{__name__}">
+	<label class="col-sm-3 control-label">{__caption__}</label>
+	<div class="col-sm-9">
+		{__input__}
+    </div>
+</div>

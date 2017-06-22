@@ -1,0 +1,3 @@
+<div class="checkbox">
+	<label><input type="checkbox" name="{__name__}[]" value="{__value__}" {__checked__}>{__caption__}</label>
+</div>

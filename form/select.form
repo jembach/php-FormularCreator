@@ -1,0 +1,8 @@
+<div class="form-group" id="id-{__name__}">
+	<label class="col-sm-3 control-label">{__caption__}</label>
+	<div class="col-sm-9">
+		<select class="form-control" name="{__name__}">
+			{__options__}
+  		</select>
+    </div>
+</div>
