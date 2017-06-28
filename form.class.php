@@ -298,7 +298,4 @@ class form {
   }
 }
 
-
-// more information
-// 
 ?>
