@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Class too output a bottstrap formular and prove the user input
+ * @category  Bootstrap Formular
+ * @package   php-FormularCreator
+ * @author    Jonas Embach
+ * @copyright Copyright (c) 2017
+ * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
+ * @link      https://github.com/jembach/php-FormularCreator
+ * @version   1.0-master
+ */
+
 class form {
 
 
