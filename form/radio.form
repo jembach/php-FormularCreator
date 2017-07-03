@@ -1,3 +1,0 @@
-<div class="radio">
-  <label><input type="radio" name="{__name__}" value="{__value__}" {__checked__}>{__caption__}</label>
-</div>

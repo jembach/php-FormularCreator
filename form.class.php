@@ -116,13 +116,26 @@ class form {
                          break;
       }
     }
-
-    self::parse(LAYOUTDIR."/general/form/form.form",
-                  array("formDir"=>LAYOUTDIR."/general/form",
-                        "formID"=>self::$instance,
-                        "action"=>$action,
-                        "checkObjects"=>$checkObject,
-                        "inputs"=>$inputs));
+    $html ='<div class="col-md-6">';
+    $html.='  <form class="form-horizontal" role="form" name="form'.self::$instance.'" id="id-form'.self::$instance.'" enctype="multipart/form-data" onsubmit="return checkForm();" action="'.$action.'" method="POST">';
+    $html.=     $inputs;
+    $html.='    <div class="form-group">';
+    $html.='      <div class="col-sm-push-3 col-sm-9">';
+    $html.='        <button type="submit" id="id-submit'.self::$instance.'" class="btn col-xs-12">Submit</button>';
+    $html.='      </div>';
+    $html.='    </div>';
+    $html.='  </form>';
+    $html.='</div>';
+    $html.=self::generateJS();
+    $html.='<script type="text/javascript">';
+    $html.='  $(\'[data-toggle="popover"]\').popover({placement: "bottom", trigger:"focus"});';
+    $html.='  var checker'.self::$instance.' = new fieldCheck();';
+    $html.='  checker'.self::$instance.'.varName = "checker'.self::$instance.'";';
+    $html.='  checker'.self::$instance.'.formObject = document.getElementById("id-form'.self::$instance.'");';
+    $html.='  checker'.self::$instance.'.setSubmitButton(document.getElementById("id-submit'.self::$instance.'"));';
+    $html.=   $checkObject;
+    $html.='</script>';
+    echo $html;
   }
 
 
@@ -179,9 +192,13 @@ class form {
    * @param  string $name Index des Formulararrays
    */
   public function file($name){
-    return self::parse(LAYOUTDIR."/general/form/file.form",
-                  array("caption"=>self::$elements[$name]["caption"],
-                        "name"=>$name),true);
+    $html ='<div class="form-group" id="id-'.$name.'">';
+    $html.='  <label class="col-sm-3 control-label">'.self::$elements[$name]["caption"].'</label>';
+    $html.='  <div class="col-sm-9">';
+    $html.='    <input class="form-control" name="'.$name.'" type="file">';
+    $html.='  </div>';
+    $html.='</div>';
+    return $html;
   }
 
   /**
@@ -189,11 +206,14 @@ class form {
   * @param  string $name Index des Formulararrays
   */
   public function input($name){
-    return self::parse(LAYOUTDIR."/general/form/input.form",
-                  array("caption"=>self::$elements[$name]["caption"],
-                        "name"=>$name,
-                        "value"=>self::$elements[$name]["value"],
-                        "dataToggle"=>self::generateToggle($name)),true);
+    $html ='<div class="form-group" id="id-'.$name.'">';
+    $html.='  <label class="col-sm-3 control-label">'.self::$elements[$name]["caption"].'</label>';
+    $html.='  <div class="col-sm-9">';
+    $html.='    <input class="form-control" name="'.$name.'" type="text" 
+                       value="'.self::$elements[$name]["value"].'" autocomplete="off" '.self::generateToggle($name).'>';
+    $html.='  </div>';
+    $html.='</div>';
+    return $html;
   }
 
   /**
@@ -201,9 +221,7 @@ class form {
   * @param  string $name Index des Formulararrays
   */
   public function hidden($name){
-    return self::parse(LAYOUTDIR."/general/form/hidden.form",
-                  array("name"=>$name,
-                        "value"=>self::$elements[$name]["value"]),true);
+    return '<input name="'.$name.'" type="hidden" value="'.self::$elements[$name]["value"].'" autocomplete="off">';
   }
 
   /**
@@ -211,11 +229,13 @@ class form {
   * @param  string $name Index des Formulararrays
   */
   public function password($name){
-    return self::parse(LAYOUTDIR."/general/form/password.form",
-                  array("caption"=>self::$elements[$name]["caption"],
-                        "name"=>$name,
-                        "value"=>self::$elements[$name]["value"],
-                        "dataToggle"=>self::generateToggle($name)),true);
+    $html ='<div class="form-group" id="id-'.$name.'">';
+    $html.='  <label for="inputPassword" class="col-sm-3 control-label">'.self::$elements[$name]["caption"].'</label>';
+    $html.='  <div class="col-sm-9">';
+    $html.='    <input class="form-control" name="'.$name.'" type="password" value="'.self::$elements[$name]["value"].'" autocomplete="off">';
+    $html.='  </div>';
+    $html.='</div>';
+    return $html;
   }
 
   /**
@@ -223,11 +243,13 @@ class form {
   * @param  string $name Index des Formulararrays
   */
   public function textarea($name){
-    return self::parse(LAYOUTDIR."/general/form/textarea.form",
-                    array("caption"=>self::$elements[$name]["caption"],
-                          "name"=>$name,
-                          "value"=>self::$elements[$name]["value"],
-                          "dataToggle"=>self::generateToggle($name)),true);
+    $html ='<div class="form-group" id="id-'.$name.'">';
+    $html.='  <label class="col-sm-3 control-label">'.self::$elements[$name]["caption"].'</label>';
+    $html.='  <div class="col-sm-9">';
+    $html.='    <textarea class="form-control" rows="5" name="'.$name.'" '.self::generateToggle($name).'>'.self::$elements[$name]["value"].'</textarea>';
+    $html.='  </div>';
+    $html.='</div>';
+    return $html;
   }
 
   /**
@@ -242,17 +264,19 @@ class form {
     foreach (self::$elements[$name]["list"] as $value => $caption) {
       $checked="";
       if(in_array($value, self::$elements[$name]["value"])) $checked="CHECKED";
-
-      $boxes.=self::parse(LAYOUTDIR."/general/form/checkbox.form",
-                              array("name"=>$name,
-                                    "value"=>$value,
-                                    "caption"=>$caption,
-                                    "checked"=>$checked),true);
+      $boxes.='<div class="checkbox">';
+      $boxes.=' <label>';
+      $boxes.='   <input type="checkbox" name="'.$name.'[]" value="'.$value.'" '.$checked.'>'.$caption;
+      $boxes.=' </label>';
+      $boxes.='</div>';
     }
-    return self::parse(LAYOUTDIR."/general/form/list.form",
-                    array("caption"=>self::$elements[$name]["caption"],
-                          "name"=>$name,
-                          "input"=>$boxes),true);
+    $html ='<div class="form-group" id="id-'.$name.'">';
+    $html.='  <label class="col-sm-3 control-label">'.self::$elements[$name]["caption"].'</label>';
+    $html.='  <div class="col-sm-9">';
+    $html.=     $boxes;
+    $html.='  </div>';
+    $html.='</div>';
+    return $html;
   }
 
   /**
@@ -264,16 +288,19 @@ class form {
     foreach (self::$elements[$name]["list"] as $value => $caption) {
       $checked="";
       if($value==self::$elements[$name]["value"]) $checked="CHECKED";
-      $boxes.=self::parse(LAYOUTDIR."/general/form/radio.form",
-                              array("name"=>$name,
-                                    "value"=>$value,
-                                    "caption"=>$caption,
-                                    "checked"=>$checked),true);
+      $boxes.='<div class="radio">';
+      $boxes.='  <label>';
+      $boxes.='    <input type="radio" name="'.$name.'" value="'.$value.'" '.$checked.'>'.$caption;
+      $boxes.='  </label>';
+      $boxes.='</div>';
     }
-    return self::parse(LAYOUTDIR."/general/form/list.form",
-                    array("caption"=>self::$elements[$name]["caption"],
-                          "name"=>$name,
-                          "input"=>$boxes),true);
+    $html ='<div class="form-group" id="id-'.$name.'">';
+    $html.='  <label class="col-sm-3 control-label">'.self::$elements[$name]["caption"].'</label>';
+    $html.='  <div class="col-sm-9">';
+    $html.=     $boxes;
+    $html.='  </div>';
+    $html.='</div>';
+    return $html;
   }
 
   /**
@@ -291,11 +318,79 @@ class form {
     foreach (self::$elements[$name]["list"] as $value => $caption) {
       $boxes.='<option value="'.$value.'">'.$caption.'</option>';
     }
-    return self::parse(LAYOUTDIR."/general/form/select.form",
-                    array("caption"=>self::$elements[$name]["caption"],
-                          "name"=>$name,
-                          "options"=>$boxes),true);
+
+    $html ='<div class="form-group" id="id-'.$name.'">';
+    $html.='  <label class="col-sm-3 control-label">'.self::$elements[$name]["caption"].'</label>';
+    $html.='  <div class="col-sm-9">';
+    $html.='    <select class="form-control" name="'.$name.'">';
+    $html.=       $boxes;
+    $html.='    </select>';
+    $html.='  </div>';
+    $html.='</div>';
+    return $html;
   }
+
+
+  protected function generateJS(){
+    $js ='<script type="text/javascript">';
+    $js.='  function fieldCheck() {';
+    $js.='    this.fields = new Array();';
+    $js.='    this.expressions = new Array();';
+    $js.='    this.submitButton = null;';
+    $js.='    this.varName = "";';
+    $js.='    this.formObject = null;';
+
+    $js.='    this.init = function(vn){this.varName = vn;};';
+
+    $js.='    this.addField = function(fieldObj, expression){';
+    $js.='      this.fields.push(fieldObj);';
+    $js.='      var expressionsID = this.expressions.push(expression);';
+    $js.='      fieldObj.setAttribute("onchange",this.varName+".checkAll()");';
+    $js.='      //fieldObj.setAttribute("onkeypress","return "+this.varName+".checkSingleObj("+expressionsID+",event);");';
+    $js.='    };';
+        
+    $js.='    this.checkSingleObj = function(fieldID, e) {';
+    $js.='      if (!e) { var e = window.event }';
+    $js.='      if (e.keyCode) { code = e.keyCode; } else if (e.which) { code = e.which; }';
+    $js.='      var character = String.fromCharCode(code);';
+                // if they pressed esc... remove focus from field...
+    $js.='      if (code == 27) { this.blur(); return false; }';
+                // ignore if they are press other keys
+                // strange because code: 39 is the down key AND ' key...';
+                // and DEL also equals .
+    $js.='      if (!e.ctrlKey && code != 9 && code != 8 && code != 36 && code != 37 && code != 38 && (code != 39 || (code == 39 && character == "\'")) && code != 40) {';
+    $js.='        if (this.fields[fieldID].value.match(this.expressions[fieldID])) {';
+    $js.='          return true;';
+    $js.='        } else {';
+    $js.='          return false;';
+    $js.='        }';
+    $js.='      }';
+    $js.='    };';
+            
+    $js.='    this.checkAll = function(){';
+    $js.='      var ok = true;';
+    $js.='      for(var i = 0; i < this.fields.length;++i){';
+    $js.='        var res = this.fields[i].value.trim();';
+    $js.='        res = res.match(this.expressions[i]);';
+    $js.='        if(res == null || res.length == 0 || res[0] != this.fields[i].value.trim()){';
+    $js.='          ok = false;';
+    $js.='          document.getElementById("id-"+this.fields[i].name).className+=" has-error";';
+    $js.='        } else {';
+    $js.='          document.getElementById("id-"+this.fields[i].name).className="form-group";';
+    $js.='        }';
+    $js.='      }';
+    $js.='      return ok;';
+    $js.='    };';
+
+    $js.='    this.setSubmitButton = function(button){';
+    $js.='      this.submitButton = button;';
+    $js.='      this.formObject.setAttribute("onsubmit","return "+this.varName+".checkAll()");';
+    $js.='    };';
+    $js.='  };';
+    $js.='</script>';
+    return $js;
+  }
+
 }
 
 ?>

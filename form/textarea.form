@@ -1,6 +1,0 @@
-<div class="form-group" id="id-{__name__}">
-	<label class="col-sm-3 control-label">{__caption__}</label>
-    <div class="col-sm-9">
-    	<textarea class="form-control" rows="5" name="{__name__}" {__dataToggle__}>{__value__}</textarea>
-    </div>
-</div>
