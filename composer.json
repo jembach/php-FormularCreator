@@ -1,0 +1,25 @@
+{
+	"name": "jembach/php-formularCreator",
+	"description": "Class to handle bootstrap forms",
+  "type": "library",
+  "keywords": [
+    "file"
+  ],
+  "license": "GPL-3.0",
+  "version": "1.0",
+  "authors": [
+        {
+            "name": "Jonas Embach",
+            "role": "Developer"
+        }
+    ],
+  "support": {
+    "docs": "https://github.com/jembach/php-FormularCreator/readme.md" 
+  },
+	"require": {
+		"php": ">=5.3.0"
+	},
+	"autoload": {
+		"files": ["form.class.php"]
+	}
+}
