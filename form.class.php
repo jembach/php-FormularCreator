@@ -14,11 +14,11 @@
 class form {
 
 
-  public static $supported=array("input","file","password","radio","checkbox","select","textarea","hidden");
+  public static $supported=array("input","file","password","radio","checkbox","select","textarea","hidden","static");
   protected static $instance=0;
-	protected var $elements=array();
-  protected var $caption;
-  protected var $emptyObjects=array();
+  var $elements=array();
+  var $caption;
+  var $emptyObjects=array();
 
   const FORM_DATE=1;
   const FORM_IMAGE=2;
@@ -38,14 +38,12 @@ class form {
     $this->caption=$caption;
   }
 
-
   /**
    * destructor - deletes the form elements
    */
   public function __destruct(){
     $this->elements=array();
   }
-
 
   /**
    * adds a html formular input 
@@ -73,7 +71,6 @@ class form {
     }
   }
 
-
   /**
    * checks if all required elements were successfull send
    *
@@ -88,7 +85,6 @@ class form {
     return (count($this->emptyObjects)==0);
   }
 
-
   /**
    * returns a list of input elements that are required but not 
    * successfully returned
@@ -100,7 +96,6 @@ class form {
       self::check();
     return $this->emptyObjects;
   }
-
 
   /**
    * Determines if formular was send
@@ -118,13 +113,13 @@ class form {
     else                                                                          return false;
   }
 
-
   /**
    * outputs the formular
    *
-   * @param      string  $action  The GET var to prove if formular was send
+   * @param      string  $buttonText  The text which should be displayed on the button
+   * @param      string  $action      The GET var to prove if formular was send
    */
-  public function toHtml($action = "?submit"){
+  public function toHtml($buttonText="Submit",$action = "?submit"){
     $inputs=""; $checkObject="";
     foreach ($this->elements as $name => $value) {
       switch ($value['type']) {
@@ -160,6 +155,8 @@ class form {
                          if($value['required']===true)
                             $checkObject.="checker".self::$instance.".addField(document.getElementsByName(\"".$name."\")[0],".$value['regex'].");\n";
                          break;
+        case 'static':   $inputs.=self::staticE($name);
+                         break;
       }
     }
     $html ='<div class="col-md-6">';
@@ -167,23 +164,22 @@ class form {
     $html.=     $inputs;
     $html.='    <div class="form-group">';
     $html.='      <div class="col-sm-push-3 col-sm-9">';
-    $html.='        <button type="submit" id="id-submit'.self::$instance.'" class="btn col-xs-12">Submit</button>';
+    $html.='        <button type="submit" id="id-submit'.self::$instance.'" class="btn col-xs-12">'.$buttonText.'</button>';
     $html.='      </div>';
     $html.='    </div>';
     $html.='  </form>';
     $html.='</div>';
     $html.=self::generateJS();
-    $html.='<script type="text/javascript">';
-    $html.='  $(\'[data-toggle="popover"]\').popover({placement: "bottom", trigger:"focus"});';
-    $html.='  var checker'.self::$instance.' = new fieldCheck();';
-    $html.='  checker'.self::$instance.'.varName = "checker'.self::$instance.'";';
-    $html.='  checker'.self::$instance.'.formObject = document.getElementById("id-form'.self::$instance.'");';
-    $html.='  checker'.self::$instance.'.setSubmitButton(document.getElementById("id-submit'.self::$instance.'"));';
+    $html.="<script type=\"text/javascript\">\n";
+    //$html.="  $('[data-toggle=\"popover\"]').popover({placement: \"bottom\", trigger:\"focus\"});\n";
+    $html.="  var checker".self::$instance." = new fieldCheck();\n";
+    $html.="  checker".self::$instance.".varName = \"checker".self::$instance."\";\n";
+    $html.="  checker".self::$instance.".formObject = document.getElementById(\"id-form".self::$instance."\");\n";
+    $html.="  checker".self::$instance.".setSubmitButton(document.getElementById(\"id-submit".self::$instance."\"));\n";
     $html.=   $checkObject;
-    $html.='</script>';
-    echo $html;
+    $html.="</script>\n";
+    return $html;
   }
-
 
   /**
    * generate the bootstrap toggle by the regex
@@ -207,7 +203,6 @@ class form {
       return "";
   }
 
-
   /**
    * returns the html code for a file input
    *
@@ -224,7 +219,6 @@ class form {
     $html.='</div>';
     return $html;
   }
-
   
   /**
    * returns the html code for a text input
@@ -244,6 +238,22 @@ class form {
     return $html;
   }
 
+  /**
+   * returns the html code for a text input
+   *
+   * @param      string  $name   The name of the form element
+   *
+   * @return     string  html code
+   */
+  protected function staticE($name){
+    $html ='<div class="form-group" id="id-'.$name.'">';
+    $html.='  <label class="col-sm-3 control-label">'.$this->elements[$name]["caption"].'</label>';
+    $html.='  <div class="col-sm-9">';
+    $html.='    <p class="form-control-static">'.$this->elements[$name]["value"].'</p>';
+    $html.='  </div>';
+    $html.='</div>';
+    return $html;
+  }
 
   /**
    * returns the html code for a hidden input
@@ -256,7 +266,6 @@ class form {
     return '<input name="'.$name.'" type="hidden" value="'.$this->elements[$name]["value"].'" autocomplete="off">';
   }
 
-  
   /**
    * returns the html code for a password input
    *
@@ -274,7 +283,6 @@ class form {
     return $html;
   }
 
-
   /**
    * returns the html code for a textarea input
    *
@@ -291,7 +299,6 @@ class form {
     $html.='</div>';
     return $html;
   }
-
 
   /**
    * returns the html code for a list of checkboxes
@@ -323,7 +330,6 @@ class form {
     return $html;
   }
 
-
   /**
    * returns the html code for a list of radio elements
    *
@@ -350,7 +356,6 @@ class form {
     $html.='</div>';
     return $html;
   }
-
 
   /**
    * returns the html code for a slect input
@@ -382,72 +387,70 @@ class form {
     return $html;
   }
 
-
   /**
    * returns the js code that is necessary for the required prove
    *
    * @return     string  js code
    */
   protected function generateJS(){
-    $js ='<script type="text/javascript">';
-    $js.='  function fieldCheck() {';
-    $js.='    this.fields = new Array();';
-    $js.='    this.expressions = new Array();';
-    $js.='    this.submitButton = null;';
-    $js.='    this.varName = "";';
-    $js.='    this.formObject = null;';
+    $js ="<script type=\"text/javascript\">\n";
+    $js.="  function fieldCheck() {\n";
+    $js.="    this.fields = new Array();\n";
+    $js.="    this.expressions = new Array();\n";
+    $js.="    this.submitButton = null;\n";
+    $js.="    this.varName = \"\";\n";
+    $js.="    this.formObject = null;\n";
 
-    $js.='    this.init = function(vn){this.varName = vn;};';
+    $js.="    this.init = function(vn){this.varName = vn;};\n";
 
-    $js.='    this.addField = function(fieldObj, expression){';
-    $js.='      this.fields.push(fieldObj);';
-    $js.='      var expressionsID = this.expressions.push(expression);';
-    $js.='      fieldObj.setAttribute("onchange",this.varName+".checkAll()");';
-    $js.='      //fieldObj.setAttribute("onkeypress","return "+this.varName+".checkSingleObj("+expressionsID+",event);");';
-    $js.='    };';
+    $js.="    this.addField = function(fieldObj, expression){\n";
+    $js.="      this.fields.push(fieldObj);\n";
+    $js.="      var expressionsID = this.expressions.push(expression);\n";
+    $js.="      fieldObj.setAttribute(\"onchange\",this.varName+\".checkAll()\");\n";
+    $js.="      //fieldObj.setAttribute(\"onkeypress\",\"return \"+this.varName+\".checkSingleObj(\"+expressionsID+\",event);\");\n";
+    $js.="    };\n";
         
-    $js.='    this.checkSingleObj = function(fieldID, e) {';
-    $js.='      if (!e) { var e = window.event }';
-    $js.='      if (e.keyCode) { code = e.keyCode; } else if (e.which) { code = e.which; }';
-    $js.='      var character = String.fromCharCode(code);';
+    $js.="    this.checkSingleObj = function(fieldID, e) {\n";
+    $js.="      if (!e) { var e = window.event }\n";
+    $js.="      if (e.keyCode) { code = e.keyCode; } else if (e.which) { code = e.which; }\n";
+    $js.="      var character = String.fromCharCode(code);\n";
                 // if they pressed esc... remove focus from field...
-    $js.='      if (code == 27) { this.blur(); return false; }';
+    $js.="      if (code == 27) { this.blur(); return false; }\n";
                 // ignore if they are press other keys
                 // strange because code: 39 is the down key AND ' key...';
                 // and DEL also equals .
-    $js.='      if (!e.ctrlKey && code != 9 && code != 8 && code != 36 && code != 37 && code != 38 && (code != 39 || (code == 39 && character == "\'")) && code != 40) {';
-    $js.='        if (this.fields[fieldID].value.match(this.expressions[fieldID])) {';
-    $js.='          return true;';
-    $js.='        } else {';
-    $js.='          return false;';
-    $js.='        }';
-    $js.='      }';
-    $js.='    };';
+    $js.="      if (!e.ctrlKey && code != 9 && code != 8 && code != 36 && code != 37 && code != 38 && (code != 39 || (code == 39 && character == \"'\")) && code != 40) {\n";
+    $js.="        if (this.fields[fieldID].value.match(this.expressions[fieldID])) {\n";
+    $js.="          return true;\n";
+    $js.="        } else {\n";
+    $js.="          return false;\n";
+    $js.="        }\n";
+    $js.="      }\n";
+    $js.="    };\n";
             
-    $js.='    this.checkAll = function(){';
-    $js.='      var ok = true;';
-    $js.='      for(var i = 0; i < this.fields.length;++i){';
-    $js.='        var res = this.fields[i].value.trim();';
-    $js.='        res = res.match(this.expressions[i]);';
-    $js.='        if(res == null || res.length == 0 || res[0] != this.fields[i].value.trim()){';
-    $js.='          ok = false;';
-    $js.='          document.getElementById("id-"+this.fields[i].name).className+=" has-error";';
-    $js.='        } else {';
-    $js.='          document.getElementById("id-"+this.fields[i].name).className="form-group";';
-    $js.='        }';
-    $js.='      }';
-    $js.='      return ok;';
-    $js.='    };';
+    $js.="    this.checkAll = function(){\n";
+    $js.="      var ok = true;\n";
+    $js.="      for(var i = 0; i < this.fields.length;++i){\n";
+    $js.="        var res = this.fields[i].value.trim();\n";
+    $js.="        res = res.match(this.expressions[i]);\n";
+    $js.="        if(res == null || res.length == 0 || res[0] != this.fields[i].value.trim()){\n";
+    $js.="          ok = false;\n";
+    $js.="          document.getElementById(\"id-\"+this.fields[i].name).className+=\" has-error\";\n";
+    $js.="        } else {";
+    $js.="          document.getElementById(\"id-\"+this.fields[i].name).className=\"form-group\";\n";
+    $js.="        }\n";
+    $js.="      }\n";
+    $js.="      return ok;\n";
+    $js.="    };\n";
 
-    $js.='    this.setSubmitButton = function(button){';
-    $js.='      this.submitButton = button;';
-    $js.='      this.formObject.setAttribute("onsubmit","return "+this.varName+".checkAll()");';
-    $js.='    };';
-    $js.='  };';
-    $js.='</script>';
+    $js.="    this.setSubmitButton = function(button){\n";
+    $js.="      this.submitButton = button;\n";
+    $js.="      this.formObject.setAttribute(\"onsubmit\",\"return \"+this.varName+\".checkAll()\");\n";
+    $js.="    };\n";
+    $js.="  };\n";
+    $js.="</script>\n";
     return $js;
   }
-
 }
 
 ?>
